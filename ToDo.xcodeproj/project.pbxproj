@@ -29,9 +29,22 @@
 		1AD22BAA2DDF432A00CA852E /* ToDoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ToDoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		1AD74E9F2DE093B900E5F0B2 /* Exceptions for "ToDo" folder in "ToDo" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 1AD22B892DDF432900CA852E /* ToDo */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		1AD22B8C2DDF432900CA852E /* ToDo */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				1AD74E9F2DE093B900E5F0B2 /* Exceptions for "ToDo" folder in "ToDo" target */,
+			);
 			path = ToDo;
 			sourceTree = "<group>";
 		};
