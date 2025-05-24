@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CoreData
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -19,26 +20,35 @@ var window: UIWindow?
         return true
     }
     
-    func applicationWillResignActive(_ application: UIApplication) {
-        
-    }
-
-    func applicationDidEnterBackground(_ application: UIApplication) {
-        print("Application did enter background")
-    }
-    
-   
-    func applicationDidBecomeActive(_ application: UIApplication) {
-        print("Application did become active")
-    }
-    func applicationWillEnterForeground(_ application: UIApplication) {
-        print("Application will enter foreground")
-    }
-
-
     func applicationWillTerminate(_ application: UIApplication) {
-        print("Application will terminate")
+        self.saveContext()
     }
+
+    lazy var persistentContainer: NSPersistentContainer = {
+       
+        let container = NSPersistentContainer(name: "DataModel")
+        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+            if let error = error as NSError? {
+                fatalError("Unresolved error \(error), \(error.userInfo)")
+            }
+        })
+        return container
+    }()
+
+    // MARK: - Core Data Saving support
+
+    func saveContext () {
+        let context = persistentContainer.viewContext
+        if context.hasChanges {
+            do {
+                try context.save()
+            } catch {
+                let nserror = error as NSError
+                fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+            }
+        }
+    }
+  
 
 }
 
