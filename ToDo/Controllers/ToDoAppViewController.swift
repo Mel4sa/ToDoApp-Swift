@@ -28,22 +28,95 @@ class ToDoAppViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-
         let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoltemCell", for: indexPath)
-
         let item = items[indexPath.row]
         cell.textLabel?.text = item.title
-        cell.accessoryType = item.done ? .checkmark : .none
-
         return cell
     }
 
     // MARK: - TableView Delegate Methods
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        items[indexPath.row].done.toggle()
-        saveItems()
+        // Edit işlemi için alert göster
+        var textField = UITextField()
+        let alert = UIAlertController(title: "Edit Item", message: nil, preferredStyle: .alert)
+        
+        textField.text = items[indexPath.row].title
+        
+        let action = UIAlertAction(title: "Save", style: .default) { _ in
+            guard let newTitle = textField.text, !newTitle.isEmpty else { return }
+            
+            self.items[indexPath.row].title = newTitle
+            self.saveItems()
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        
+        alert.addTextField { alertTextField in
+            alertTextField.placeholder = "Edit item"
+            textField = alertTextField
+        }
+        
+        alert.addAction(action)
+        alert.addAction(cancelAction)
+        present(alert, animated: true)
+        
         tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
+    // MARK: - Swipe Actions
+    
+    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        // Silme aksiyonu
+        let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { [weak self] (action, view, completion) in
+            guard let self = self else { return }
+            
+            // CoreData'dan silme
+            self.context.delete(self.items[indexPath.row])
+            // Array'den silme
+            self.items.remove(at: indexPath.row)
+            // Değişiklikleri kaydetme
+            self.saveItems()
+            
+            completion(true)
+        }
+        
+        // Düzenleme aksiyonu
+        let editAction = UIContextualAction(style: .normal, title: "Edit") { [weak self] (action, view, completion) in
+            guard let self = self else { return }
+            
+            var textField = UITextField()
+            let alert = UIAlertController(title: "Edit Item", message: nil, preferredStyle: .alert)
+            
+            textField.text = self.items[indexPath.row].title
+            
+            let saveAction = UIAlertAction(title: "Save", style: .default) { _ in
+                guard let newTitle = textField.text, !newTitle.isEmpty else { return }
+                
+                self.items[indexPath.row].title = newTitle
+                self.saveItems()
+            }
+            
+            let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+            
+            alert.addTextField { alertTextField in
+                alertTextField.placeholder = "Edit item"
+                textField = alertTextField
+            }
+            
+            alert.addAction(saveAction)
+            alert.addAction(cancelAction)
+            self.present(alert, animated: true)
+            
+            completion(true)
+        }
+        
+        // Düzenleme butonunun rengini mavi yap
+        editAction.backgroundColor = .systemBlue
+        
+        // Aksiyonları yapılandır
+        let configuration = UISwipeActionsConfiguration(actions: [deleteAction, editAction])
+        return configuration
     }
 
     // MARK: - Add New Item
@@ -58,7 +131,6 @@ class ToDoAppViewController: UITableViewController {
             
             let newItem = Item(context: self.context)
             newItem.title = newTitle
-            newItem.done = false
             newItem.parentCategory = currentCategory
 
             self.items.append(newItem)
