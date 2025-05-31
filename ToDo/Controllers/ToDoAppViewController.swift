@@ -30,36 +30,23 @@ class ToDoAppViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoltemCell", for: indexPath)
         let item = items[indexPath.row]
-        cell.textLabel?.text = item.title
+        
+        // Metin özelliklerini ayarla
+        let attributedString = NSAttributedString(
+            string: item.title ?? "",
+            attributes: item.done ? [.strikethroughStyle: NSUnderlineStyle.single.rawValue] : [:]
+        )
+        cell.textLabel?.attributedText = attributedString
+        
         return cell
     }
 
     // MARK: - TableView Delegate Methods
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        // Edit işlemi için alert göster
-        var textField = UITextField()
-        let alert = UIAlertController(title: "Edit Item", message: nil, preferredStyle: .alert)
-        
-        textField.text = items[indexPath.row].title
-        
-        let action = UIAlertAction(title: "Save", style: .default) { _ in
-            guard let newTitle = textField.text, !newTitle.isEmpty else { return }
-            
-            self.items[indexPath.row].title = newTitle
-            self.saveItems()
-        }
-        
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
-        
-        alert.addTextField { alertTextField in
-            alertTextField.placeholder = "Edit item"
-            textField = alertTextField
-        }
-        
-        alert.addAction(action)
-        alert.addAction(cancelAction)
-        present(alert, animated: true)
+        // İşin tamamlanma durumunu değiştir
+        items[indexPath.row].done = !items[indexPath.row].done
+        saveItems()
         
         tableView.deselectRow(at: indexPath, animated: true)
     }
